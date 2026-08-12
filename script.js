@@ -1,6 +1,8 @@
 const taskContainerEl = document.querySelector("#task-container");
 let latestTaskId = 0;
 
+let currentView = "all";
+
 let tasks = [];
 
 const storedTasks = localStorage.getItem("tasks");
@@ -15,8 +17,18 @@ if (storedTasks) {
 const renderTasks = () => {
 
   taskContainerEl.innerHTML = "";
-  
-  for (let task of tasks){
+
+  let visibleTasks = [...tasks];
+
+  if (currentView === "active") {
+    visibleTasks = visibleTasks.filter(task => !task.completed);
+  }
+
+  if (currentView === "completed") {
+    visibleTasks = visibleTasks.filter(task => task.completed);
+  }  
+
+  for (let task of visibleTasks){
     const taskEl = document.createElement("div");
     taskEl.className = "task";
 
@@ -195,9 +207,18 @@ const appendNewTask = (title, desc, priority, date_due) => {
   renderTasks();
 }
 
-
-
 }
+
+const activateFilterButtons = () => {
+  const filterButtons = document.querySelectorAll(".filter-btn");
+
+  for (let button of filterButtons) {
+    button.addEventListener("click", () => {
+      currentView = button.dataset.view;
+      renderTasks();
+    });
+  }
+};
 
 const persistTasks = () =>{
   window.localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -205,8 +226,10 @@ const persistTasks = () =>{
 
 const start = () => {
 
+  persistTasks();
   activateAddTaskBtn();
   renderTasks();
+  activateFilterButtons();
 
 }
 
