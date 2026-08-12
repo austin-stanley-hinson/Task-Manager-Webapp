@@ -1,4 +1,4 @@
-const taskContainerEl = document.getElementById("task-container");
+const taskContainerEl = document.querySelector("#task-container");
 
 let tasks = [
 
@@ -34,7 +34,9 @@ let tasks = [
 
 
 const renderTasks = () => {
+
   taskContainerEl.innerHTML = "";
+  
   for (let task of tasks){
     const taskEl = document.createElement("div");
     taskEl.className = "task";
@@ -56,8 +58,7 @@ const renderTasks = () => {
   
     const completeBtn = taskEl.querySelector(".complete-btn");
     completeBtn.addEventListener("click", () => {
-    task.completed = true;
-    
+    task.completed = !task.completed;
     console.log(task);
     renderTasks();
   })
@@ -70,14 +71,62 @@ const renderTasks = () => {
   
     if (task.completed){
       taskEl.classList.add("completed");
+      completeBtn.textContent = "Completed";
     }
 
     taskContainerEl.appendChild(taskEl);
 
-
   }
 
 }
+
+const activateAddTaskBtn = () => {
+const formContainerEl = document.querySelector("#form-container");
+const addTaskBtnEl = document.querySelector("#add-task-btn");
+
+addTaskBtnEl.addEventListener("click", () => {
+  const formEl = document.createElement("form");
+
+  formEl.innerHTML = `
+    <label for="title-input">
+      Title:
+      <input type="text" id="title-input" required>
+    </label>
+
+    <label for="description-input">
+      Description:
+      <input type="text" id="description-input">
+    </label>
+
+    <label for="priority-input">
+      Priority:
+      <select id="priority-input">
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+      </select>
+    </label>
+
+    <label for="due-date-input">
+      Due Date:
+      <input type="date" id="due-date-input">
+    </label>
+
+    <button type="submit">Add Task</button>
+  `;
+
+  formContainerEl.appendChild(formEl);
+});
+
+//trying to trigger another function when they tap submit 
+addTaskBtnEl.addEventListener("submit", () => {
+  console.log('Form submitted')
+})
+
+
+}
+
+activateAddTaskBtn();
 
 renderTasks();
 

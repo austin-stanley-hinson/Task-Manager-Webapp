@@ -49,5 +49,14 @@
 }
 
 .completed{
-  opacity: 0.5;
+  opacity: 0.7;
 }
+
+.completed h1{
+text-decoration: line-through;
+}
+
+#form-container{
+  margin: 10px 10px;
+}
+
