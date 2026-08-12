@@ -56,7 +56,8 @@
 text-decoration: line-through;
 }
 
-#form-container{
+#form-container, #edit-task-form{
   margin: 10px 10px;
 }
+
 

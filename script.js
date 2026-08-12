@@ -1,39 +1,17 @@
 const taskContainerEl = document.querySelector("#task-container");
-let latestTaskId = 4;
+let latestTaskId = 0;
 
-let tasks = [
+let tasks = [];
 
-{ id : 1,
-  title : "Web Development Studies",
-  description : ["Learn JavaScript", "Learn React"], 
-  priority : "High",
-  due_date : "Sep. 2026",
-  completed : false
-},
+const storedTasks = localStorage.getItem("tasks");
 
-{
-  id : 2, 
-  title : "Technical Interview Prep",
-  description : ["Solve Graph Problems", "Solve Neetcode 150"], 
-  priority : "High",
-  due_date : "Oct. 2026",
-  completed : false
+if (storedTasks) {
+  tasks = JSON.parse(storedTasks);
 
-},
-
-{
-  id : 3, 
-  title : "Machine Learning Fundamentals",
-  description : ["Learn Supervised Training", "Learn Deep Learning"], 
-  priority : "High",
-  due_date : "Sep. 2026",
-  completed : false
-
+  if (tasks.length > 0) {
+    latestTaskId = Math.max(...tasks.map(task => task.id)) + 1;
+  }
 }
-
-];
-
-
 const renderTasks = () => {
 
   taskContainerEl.innerHTML = "";
@@ -61,12 +39,14 @@ const renderTasks = () => {
     completeBtn.addEventListener("click", () => {
     task.completed = !task.completed;
     console.log(task);
+    persistTasks();
     renderTasks();
   })
 
     const deleteBtn = taskEl.querySelector(".delete-btn")
     deleteBtn.addEventListener("click", () => {
       tasks = tasks.filter(cur_task => cur_task.id !== task.id);
+      persistTasks();
       renderTasks();
     })
   
@@ -74,6 +54,69 @@ const renderTasks = () => {
       taskEl.classList.add("completed");
       completeBtn.textContent = "Completed";
     }
+
+    const editBtn = taskEl.querySelector(".edit-btn");
+
+    editBtn.addEventListener("click", () => {
+      //want to prevent having duplicate edit forms 
+      const formEl = document.createElement("form");
+      formEl.id = "edit-task-form"
+      formEl.innerHTML = `
+    <label for="title-input">
+      Title:
+      <input type="text" id="title-input" required>
+    </label>
+
+    <label for="description-input">
+      Description:
+      <input type="text" id="description-input">
+    </label>
+
+    <label for="priority-input">
+      Priority:
+      <select id="priority-input">
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+      </select>
+    </label>
+
+    <label for="due-date-input">
+      Due Date:
+      <input type="date" id="due-date-input">
+    </label>
+
+    <button type="submit">Save changes</button>
+  `;
+
+  const taskTitleEl = formEl.querySelector("#title-input");
+  taskTitleEl.value = task.title;
+
+  const taskDescEl = formEl.querySelector("#description-input");
+  taskDescEl.value = task.description.join(", ");
+
+  const taskPriorityEl = formEl.querySelector("#priority-input");
+  taskPriorityEl.value = task.priority;
+
+  const taskDateEl = formEl.querySelector("#due-date-input");
+  taskDateEl.value = task.due_date;
+
+  formEl.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    task.title = taskTitleEl.value;
+    task.description = taskDescEl.value.split(",").map(item => item.trim()).filter(item => item !== "");
+    task.priority = taskPriorityEl.value;
+    task.due_date = taskDateEl.value ? taskDateEl.value: task.due_date;
+
+    formEl.remove();
+    persistTasks();
+    renderTasks();
+  })
+  
+  taskEl.appendChild(formEl);
+
+    })
 
     taskContainerEl.appendChild(taskEl);
 
@@ -138,9 +181,9 @@ const appendNewTask = (title, desc, priority, date_due) => {
   const newTask = {
     id : latestTaskId,
     title,
-    description: desc.split(",").map(item => item.trim()), 
+    description: desc.split(",").map(item => item.trim()).filter(item => item !== ""), 
     priority,
-    due_date: date_due ? due_date:"not specified",
+    due_date: date_due ? date_due:"not specified",
     completed: false
     }
 
@@ -148,17 +191,30 @@ const appendNewTask = (title, desc, priority, date_due) => {
   ++latestTaskId;
 
   tasks.push(newTask);
-  renderTasks()
-
+  persistTasks();
+  renderTasks();
 }
 
 
 
 }
 
-activateAddTaskBtn();
+const persistTasks = () =>{
+  window.localStorage.setItem("tasks", JSON.stringify(tasks));
+}
 
-renderTasks();
+const start = () => {
+
+  activateAddTaskBtn();
+  renderTasks();
+
+}
+
+start();
+
+
+ 
+
 
 
 
