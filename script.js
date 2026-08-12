@@ -1,4 +1,5 @@
 const taskContainerEl = document.querySelector("#task-container");
+let latestTaskId = 4;
 
 let tasks = [
 
@@ -85,6 +86,7 @@ const formContainerEl = document.querySelector("#form-container");
 const addTaskBtnEl = document.querySelector("#add-task-btn");
 
 addTaskBtnEl.addEventListener("click", () => {
+  formContainerEl.innerHTML = "";
   const formEl = document.createElement("form");
 
   formEl.innerHTML = `
@@ -115,13 +117,41 @@ addTaskBtnEl.addEventListener("click", () => {
     <button type="submit">Add Task</button>
   `;
 
+  formEl.addEventListener("submit", (event) =>{
+    event.preventDefault();
+
+    const newTaskTitle = formEl.querySelector("#title-input").value;
+    const newTaskDesc = formEl.querySelector("#description-input").value;
+    const newTaskPriority = formEl.querySelector("#priority-input").value;
+    const newTaskDuedate = formEl.querySelector("#due-date-input").value;
+
+    appendNewTask(newTaskTitle, newTaskDesc, newTaskPriority, newTaskDuedate);
+    formEl.remove();
+
+  })
+
   formContainerEl.appendChild(formEl);
+
 });
 
-//trying to trigger another function when they tap submit 
-addTaskBtnEl.addEventListener("submit", () => {
-  console.log('Form submitted')
-})
+const appendNewTask = (title, desc, priority, date_due) => {
+  const newTask = {
+    id : latestTaskId,
+    title,
+    description: desc.split(",").map(item => item.trim()), 
+    priority,
+    due_date: date_due ? due_date:"not specified",
+    completed: false
+    }
+
+
+  ++latestTaskId;
+
+  tasks.push(newTask);
+  renderTasks()
+
+}
+
 
 
 }
